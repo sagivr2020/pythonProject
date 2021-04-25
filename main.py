@@ -1,44 +1,24 @@
-import json
+import os
 import requests
 import wrapt
+import epsagon
+import wrappingLib
+
+epsagon.init(
+    token='3b6fb738-df8a-4de2-9de2-afbadc80718e',
+    app_name='Epsagon Exce',
+    metadata_only=False,
+)
 
 
-def wrapper(wrapped, instance, args, kwargs):
-    metadata = {}
-
-    try:
-        if args[1] == 'https://ora4d07er6.execute-api.us-east-1.amazonaws.com/dev':
-            return wrapped(*args, **kwargs)
-
-        metadata['operation name'] = wrapped.__name__
-        metadata['module'] = wrapped.__module__
-        metadata['operation type'] = args[0]
-        metadata['url'] = args[1]
-        metadata['arguments'] = kwargs
-        metadata['exception'] = ''
-
-    except Exception as e:
-        metadata['exception'] = e.args
-        return e
-
-    print(json.dumps(metadata))
-
-    requests.post('https://ora4d07er6.execute-api.us-east-1.amazonaws.com/dev', json.dumps(metadata))
+wrapt.wrap_function_wrapper(requests.api, 'request', wrappingLib.wrapper)
 
 
-wrapt.wrap_function_wrapper(requests.api, 'request', wrapper)
-
-
+@epsagon.python_wrapper
 def test():
-    requests.post('http://www.sport5.co.il', data={'test': 'wowow'})
-    requests.get('http://www.sport5.co.il', headers={'test': 'wow'})
+    requests.post('http://www.pi.com', data={'test': 'wowow'})
+    requests.get('http://www.pi.com', headers={'test': 'wow'})
 
 
 if __name__ == '__main__':
     test()
-
-"""""
-to do:
-get the data from the trace
-store it into rds
-"""
